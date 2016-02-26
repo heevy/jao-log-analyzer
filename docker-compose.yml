@@ -1,0 +1,34 @@
+elastic:
+ build: elastic
+ ports:
+  - 9200
+
+logstash:
+ build: logstash
+ ports:
+  - 3333
+ links:
+  - elastic
+ command: logstash -f /config-dir/logstash.conf
+
+jaologprocessor:
+ build: jao_log_processor
+ links:
+  - logstash
+ volumes:
+  - "./input-dir:/input-dir"
+
+kibana:
+ build: kibana
+ links:
+  - elastic:elasticsearch
+ ports:
+  - 80:80
+
+dashboards:
+ build: dashboards-loader
+ links:
+  - elastic:elasticsearch
+ volumes:
+  - ./dashboards:/dashboards
+
